@@ -1,0 +1,5 @@
+{
+  "name": "Gemini Blog CMS",
+  "description": "A content management system for a blog that uses the Gemini API to generate post content from user prompts. Users can create, view, edit, and delete blog posts with AI-powered assistance.",
+  "requestFramePermissions": []
+}
