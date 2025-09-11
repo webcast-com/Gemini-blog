@@ -45,13 +45,33 @@ type View = 'home' | 'view' | 'edit' | 'create' | 'login' | 'news';
 
 const ADMIN_PASSWORD = 'password123';
 const SESSION_KEY = 'gemini-blog-auth';
+const POSTS_STORAGE_KEY = 'gemini-blog-posts';
 
 const App: React.FC = () => {
-    const [posts, setPosts] = useState<Post[]>(initialPosts);
+    const [posts, setPosts] = useState<Post[]>(() => {
+        try {
+            const savedPosts = localStorage.getItem(POSTS_STORAGE_KEY);
+            return savedPosts ? JSON.parse(savedPosts) : initialPosts;
+        } catch (error) {
+            console.error('Error reading posts from localStorage:', error);
+            return initialPosts;
+        }
+    });
+
     const [view, setView] = useState<View>('home');
     const [currentPostId, setCurrentPostId] = useState<string | null>(null);
     const [isAdmin, setIsAdmin] = useState(false);
     const [selectedCategory, setSelectedCategory] = useState('All');
+
+    // Persist posts to localStorage whenever they change
+    useEffect(() => {
+        try {
+            localStorage.setItem(POSTS_STORAGE_KEY, JSON.stringify(posts));
+        } catch (error) {
+            console.error('Error saving posts to localStorage:', error);
+        }
+    }, [posts]);
+
 
     // Check session on initial load
     useEffect(() => {
@@ -68,7 +88,7 @@ const App: React.FC = () => {
             // Create new post
             const newPost: Post = {
                 ...postToSave,
-                id: (posts.length + 1).toString(),
+                id: crypto.randomUUID(),
                 createdAt: new Date().toISOString(),
             };
             setPosts([newPost, ...posts]);
